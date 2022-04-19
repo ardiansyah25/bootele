@@ -1,29 +1,19 @@
 require('dotenv').config();
 
-const { BOT_TOKEN } = process.env;
-const { Telegraf } = require('telegraf')
+const { Telegraf, Extra, Markup } = require('telegraf')
 
-const bot = new Telegraf(BOT_TOKEN)
 
-bot.hears("location", (ctx) => {
-  console.log(ctx.from)
-  bot.telegram.sendMessage(ctx.chat.id, 'Can we access your location?', requestLocationKeyboard);
-})
+const keyboard = Markup.inlineKeyboard([
+  Markup.urlButton('❤️', 'http://telegraf.js.org'),
+  Markup.callbackButton('Delete', 'delete')
+])
 
-const requestLocationKeyboard = {
-  "reply_markup": {
-    "one_time_keyboard": true,
-    "keyboard": [
-      [{
-        text: "My location",
-        request_location: true,
-        one_time_keyboard: true
-      }],
-      ["Cancel"]
-    ]
-  }
-
-}
+const bot = new Telegraf(process.env.BOT_TOKEN)
+bot.start((ctx) => ctx.reply('Hello'))
+bot.help((ctx) => ctx.reply('Help message'))
+bot.on('message', (ctx) => ctx.copyMessage(ctx.chat.id, Extra.markup(keyboard)))
+bot.action('delete', ({ deleteMessage }) => deleteMessage())
+bot.launch()
 
 bot.launch()
 
